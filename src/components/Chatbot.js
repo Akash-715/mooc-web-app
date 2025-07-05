@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./Chatbot.css";
 
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
@@ -106,42 +105,137 @@ export default function Chatbot() {
     if (e.key === "Enter") handleSend();
   };
 
-  return (
-    <div className="chatbot-container">
-      {open && (
-        <div className="chat-window">
-          <div className="chat-header">
-            CourseBot 🤎
-            <button onClick={() => setOpen(false)}>✖</button>
-          </div>
+  const styles = {
+    container: {
+      position: "fixed",
+      bottom: "20px",
+      right: "20px",
+      zIndex: 9999,
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    },
+    toggleButton: {
+      backgroundColor: "#6f4e37",
+      color: "#fff",
+      border: "none",
+      borderRadius: "50%",
+      width: "55px",
+      height: "55px",
+      fontSize: "22px",
+      cursor: "pointer",
+      boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+    },
+    chatWindow: {
+      width: "300px",
+      backgroundColor: "#f8f1e7",
+      borderRadius: "15px",
+      boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      animation: "slideUp 0.3s ease-in-out",
+    },
+    chatHeader: {
+      backgroundColor: "#a9746e",
+      color: "#fff",
+      padding: "10px 15px",
+      fontWeight: "bold",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    chatBody: {
+      padding: "10px",
+      height: "250px",
+      overflowY: "auto",
+      backgroundColor: "#fdf7f2",
+      display: "flex",
+      flexDirection: "column",
+    },
+    chatMsg: {
+      marginBottom: "10px",
+      padding: "8px 12px",
+      borderRadius: "12px",
+      maxWidth: "80%",
+      lineHeight: "1.4",
+      fontSize: "14px",
+    },
+    bot: {
+      backgroundColor: "#d7ccc8",
+      alignSelf: "flex-start",
+      color: "#3e2723",
+    },
+    user: {
+      backgroundColor: "#bcaaa4",
+      alignSelf: "flex-end",
+      color: "#212121",
+    },
+    chatInput: {
+      display: "flex",
+      padding: "10px",
+      backgroundColor: "#eee1d5",
+      borderTop: "1px solid #d3c2b3",
+    },
+    inputBox: {
+      flex: 1,
+      padding: "8px 10px",
+      borderRadius: "8px",
+      border: "1px solid #c2b2a3",
+      outline: "none",
+      fontSize: "14px",
+      backgroundColor: "#fffaf5",
+    },
+    sendButton: {
+      marginLeft: "8px",
+      padding: "8px 10px",
+      backgroundColor: "#6f4e37",
+      color: "white",
+      border: "none",
+      borderRadius: "8px",
+      cursor: "pointer",
+    },
+  };
 
-          <div className="chat-body">
+  return (
+    <div style={styles.container}>
+      {open && (
+        <div style={styles.chatWindow}>
+          <div style={styles.chatHeader}>
+            CourseBot 🤎
+            <button onClick={() => setOpen(false)} style={{ background: "transparent", color: "#fff", border: "none", fontSize: "16px", cursor: "pointer" }}>✖</button>
+          </div>
+          <div style={styles.chatBody}>
             {messages.map((msg, idx) => (
-              <div key={idx} className={`chat-msg ${msg.sender}`}>
+              <div
+                key={idx}
+                style={{
+                  ...styles.chatMsg,
+                  ...(msg.sender === "bot" ? styles.bot : styles.user),
+                }}
+              >
                 {msg.text}
               </div>
             ))}
             {isTyping && (
-              <div className="chat-msg bot">
+              <div style={{ ...styles.chatMsg, ...styles.bot }}>
                 <i>Typing a fresh reply... ☕</i>
               </div>
             )}
           </div>
-
-          <div className="chat-input">
+          <div style={styles.chatInput}>
             <input
               type="text"
               value={input}
               placeholder="Ask me anything about courses, skills, or tech..."
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
+              style={styles.inputBox}
             />
-            <button onClick={handleSend}>➤</button>
+            <button onClick={handleSend} style={styles.sendButton}>➤</button>
           </div>
         </div>
       )}
 
-      <button className="chat-toggle" onClick={() => setOpen(!open)}>
+      <button style={styles.toggleButton} onClick={() => setOpen(!open)}>
         💬
       </button>
     </div>

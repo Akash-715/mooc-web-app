@@ -1,6 +1,23 @@
 import React, { useEffect, useState } from "react";
 import axios from "../utils/axiosConfig";
 import { useNavigate } from "react-router-dom";
+import refreshIcon from "../assets/refresh.png"; // adjust path if needed
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  PieChart,
+  Pie,
+  ResponsiveContainer,
+  CartesianGrid,
+  Cell,
+} from "recharts";
+
+const barColors = ["#6f4e37", "#c97c5d", "#a0522d", "#deb887", "#d2691e", "#8b4513"];
+const pieColors = ["#f4a261", "#2a9d8f", "#e76f51", "#e9c46a", "#264653", "#ffb4a2"];
 
 export default function AdminDashboard() {
   const [courses, setCourses] = useState([]);
@@ -10,6 +27,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState([]);
   const [userSearch, setUserSearch] = useState("");
+  const [isRotating, setIsRotating] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,10 +35,23 @@ export default function AdminDashboard() {
       navigate("/login");
       return;
     }
+
     loadCourses();
     loadStats();
     loadUsers();
+
+    const interval = setInterval(() => {
+      loadStats();
+    }, 60000); // auto-refresh every 60 seconds
+
+    return () => clearInterval(interval); // cleanup
   }, []);
+
+  const handleRefresh = async () => {
+    setIsRotating(true);
+    await loadStats();
+    setTimeout(() => setIsRotating(false), 1000);
+  };
 
   const loadCourses = async () => {
     try {
@@ -131,6 +162,74 @@ export default function AdminDashboard() {
             <li>Total Feedback: {stats.totalFeedback}</li>
             <li>Top Platforms: {stats.platformStats?.join(", ")}</li>
           </ul>
+        </div>
+      )}
+
+      {stats?.platformDistribution && (
+        <div className="mb-5">
+          <div className="d-flex align-items-center mb-2">
+            <h5 style={headingStyle} className="me-2 mb-0">Platform Distribution (Courses)</h5>
+            <button
+              onClick={handleRefresh}
+              style={{ border: "none", background: "none", padding: 0 }}
+              title="Refresh"
+            >
+              <img
+                src={refreshIcon}
+                alt="Refresh"
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  transition: "transform 0.6s ease",
+                  transform: isRotating ? "rotate(360deg)" : "none",
+                }}
+              />
+            </button>
+          </div>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={Object.entries(stats.platformDistribution).map(([platform, count]) => ({ platform, count }))}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="platform" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count">
+                {Object.entries(stats.platformDistribution).map(([platform], index) => (
+                  <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {stats?.interestAreaPopularity && (
+        <div className="mb-5">
+          <h5 style={headingStyle}>Interest Area Popularity (Users)</h5>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={Object.entries(stats.interestAreaPopularity).map(([tag, count]) => ({
+                  name: tag,
+                  value: count,
+                }))}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label
+              >
+                {Object.entries(stats.interestAreaPopularity).map(([_, __], index) => (
+                  <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       )}
 

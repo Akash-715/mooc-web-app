@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/axiosConfig";
+import Chatbot from "../components/Chatbot";
+
 
 export default function Home() {
   const [courses, setCourses] = useState([]);
@@ -57,7 +59,7 @@ export default function Home() {
 
       setCourses(data);
     } catch (err) {
-      setError("Search failed. Try again.");
+      setError("Login/Signup to search courses");
     }
   };
 
@@ -87,7 +89,7 @@ export default function Home() {
   };
 
   return (
-    <div style={{ backgroundColor: "#f6f1e7", minHeight: "100vh", paddingTop: "2rem", fontFamily: "Georgia, serif", color: "#4b3621" }}>
+    <div style={{ backgroundColor: "#f6f1e7", minHeight: "100vh", paddingTop: "2rem", fontFamily: "Georgia, serif", color: "#4b3621", position: "relative" }}>
       <div className="container">
         <h2 style={{ color: "#6f4e37", textAlign: "center" }}>
           Brew your perfect course — <em>Your daily dose of curated learning</em> ☕
@@ -148,33 +150,33 @@ export default function Home() {
                     <h5 className="card-title">{c.title}</h5>
                     <p className="card-text">{c.description}</p>
                     <div className="d-flex flex-column gap-2">
-  <div className="d-flex justify-content-between">
-    <a
-      href={c.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="btn btn-outline-dark"
-    >
-      Visit Course
-    </a>
-    <button
-      className="btn btn-outline-success"
-      onClick={() => saveCourse(c.id)}
-      disabled={savedCourseIds.has(c.id)}
-    >
-      {savedCourseIds.has(c.id) ? "Saved" : "Save"}
-    </button>
-  </div>
-  <button
-    className="btn btn-outline-secondary"
-    onClick={() => {
-      const shareUrl = `http://localhost:8080/courses/share/${c.id}`;
-      window.open(shareUrl, "_blank");
-    }}
-  >
-    📤 Share
-  </button>
-</div>
+                      <div className="d-flex justify-content-between">
+                        <a
+                          href={c.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-outline-dark"
+                        >
+                          Visit Course
+                        </a>
+                        <button
+                          className="btn btn-outline-success"
+                          onClick={() => saveCourse(c.id)}
+                          disabled={savedCourseIds.has(c.id)}
+                        >
+                          {savedCourseIds.has(c.id) ? "Saved" : "Save"}
+                        </button>
+                      </div>
+                      <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => {
+                          const shareUrl = `http://localhost:8080/courses/share/${c.id}`;
+                          window.open(shareUrl, "_blank");
+                        }}
+                      >
+                        📤 Share
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -182,6 +184,9 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {/* 👇 Chatbot should be outside the main content */}
+      <Chatbot />
     </div>
   );
 }

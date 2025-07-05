@@ -30,7 +30,13 @@ export default function Recommendations() {
           duration: mapCourseLengthToEnum(quizData.courseLength),
         };
 
-        const response = await axios.post("/courses/filter", payload);
+        const token = localStorage.getItem("token");
+const response = await axios.post("/courses/filter", payload, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+
         setCourses(response.data);
       } catch (err) {
         console.error("Failed to fetch courses:", err);

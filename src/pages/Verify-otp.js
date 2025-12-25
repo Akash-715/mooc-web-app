@@ -36,7 +36,7 @@ export default function VerifyOtp() {
           },
         });
       } else {
-        alert("✅ OTP verified! Please log in.");
+        alert("OTP verified! Please log in.");
         navigate("/login");
       }
     } catch (err) {

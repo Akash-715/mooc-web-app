@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/axiosConfig";
-import Chatbot from "../components/Chatbot";
 
 // Style object for cards
 const cardStyle = {
@@ -20,6 +19,13 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 15;
   const navigate = useNavigate();
+
+  const [filters, setFilters] = useState({
+    platform: "",
+    duration: "",
+    difficulty: "",
+    rating: "",
+  });
 
   useEffect(() => {
     fetchCourses();
@@ -111,10 +117,17 @@ export default function Home() {
     }
   };
 
-  // Pagination logic
-  const totalPages = Math.ceil(courses.length / coursesPerPage);
+  const filteredCourses = courses.filter((c) => {
+    const matchesPlatform = filters.platform ? c.platform?.toLowerCase() === filters.platform.toLowerCase() : true;
+    const matchesDuration = filters.duration ? c.duration?.toLowerCase() === filters.duration.toLowerCase() : true;
+    const matchesDifficulty = filters.difficulty ? c.difficulty?.toLowerCase() === filters.difficulty.toLowerCase() : true;
+    const matchesRating = filters.rating ? Math.floor(c.rating || 0) === parseInt(filters.rating) : true;
+    return matchesPlatform && matchesDuration && matchesDifficulty && matchesRating;
+  });
+
+  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
   const startIndex = (currentPage - 1) * coursesPerPage;
-  const currentCourses = courses.slice(startIndex, startIndex + coursesPerPage);
+  const currentCourses = filteredCourses.slice(startIndex, startIndex + coursesPerPage);
 
   const generatePageNumbers = () => {
     const pageNumbers = [];
@@ -123,15 +136,11 @@ export default function Home() {
       for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
     } else {
       pageNumbers.push(1);
-
       if (currentPage > 4) pageNumbers.push("...");
-
       for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
         pageNumbers.push(i);
       }
-
       if (currentPage < totalPages - 3) pageNumbers.push("...");
-
       pageNumbers.push(totalPages);
     }
 
@@ -156,21 +165,64 @@ export default function Home() {
 
         {error && <p className="text-danger">{error}</p>}
 
-        <div className="input-group mb-3">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search courses..."
-            value={searchQuery}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSearchQuery(value);
-              if (value === "") fetchCourses();
-            }}
-          />
-          <button className="btn btn-outline-dark" onClick={handleSearch}>
-            Search
-          </button>
+        <div className="row g-2 mb-3 align-items-center">
+          <div className="col-md-5">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search courses..."
+              value={searchQuery}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchQuery(value);
+                if (value === "") fetchCourses();
+              }}
+            />
+          </div>
+          <div className="col-md-2">
+            <select
+              className="form-select"
+              value={filters.platform}
+              onChange={(e) => setFilters({ ...filters, platform: e.target.value })}
+            >
+              <option value="">Platform</option>
+              <option value="Coursera">Coursera</option>
+              <option value="Udemy">Udemy</option>
+              <option value="edX">edX</option>
+            </select>
+          </div>
+          <div className="col-md-2">
+            <select
+              className="form-select"
+              value={filters.duration}
+              onChange={(e) => setFilters({ ...filters, duration: e.target.value })}
+            >
+              <option value="">Duration</option>
+  <option value="ONE_TO_THREE_MONTHS">1–3 Months</option>
+  <option value="TWO_TO_FOUR_MONTHS">2–4 Months</option>
+  <option value="THREE_TO_SIX_MONTHS">3–6 Months</option>
+            </select>
+          </div>
+          <div className="col-md-2">
+            <select
+              className="form-select"
+              value={filters.rating}
+              onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
+            >
+              <option value="">Rating</option>
+              <option value="5">5★</option>
+              <option value="4">4★</option>
+              <option value="3">3★</option>
+              <option value="2">2★</option>
+              <option value="1">1★</option>
+            </select>
+          </div>
+          <div className="col-md-1 ms-auto">
+  <button className="btn btn-outline-dark w-100" onClick={handleSearch}>
+    Search
+  </button>
+</div>
+
         </div>
 
         <div className="my-4 text-center">
@@ -217,19 +269,18 @@ export default function Home() {
                   }}
                 >
                   <img
-  src={c.imageUrl}
-  className="card-img-top"
-  alt={c.title}
-  style={{
-    height: "200px",
-    width: "100%",
-    objectFit: "contain",
-    backgroundColor: "#fff", // optional: gives a clean background
-    borderTopLeftRadius: "12px",
-    borderTopRightRadius: "12px",
-  }}
-/>
-
+                    src={c.imageUrl}
+                    className="card-img-top"
+                    alt={c.title}
+                    style={{
+                      height: "200px",
+                      width: "100%",
+                      objectFit: "contain",
+                      backgroundColor: "#fff",
+                      borderTopLeftRadius: "12px",
+                      borderTopRightRadius: "12px",
+                    }}
+                  />
                   <div className="card-body">
                     <h5 className="card-title">{c.title}</h5>
                     <p className="card-text">{c.description}</p>
@@ -244,7 +295,6 @@ export default function Home() {
                         >
                           Visit Course
                         </a>
-
                         {savedCourseIds.has(c.id) ? (
                           <button
                             className="btn btn-outline-danger"
@@ -268,18 +318,17 @@ export default function Home() {
                         )}
                       </div>
                       <button
-  className="btn btn-outline-secondary"
-  onClick={(e) => {
-    e.stopPropagation();
-    const shareUrl = `${window.location.origin}/coursedescp/${c.id}`;
-    navigator.clipboard.writeText(shareUrl)
-      .then(() => alert("Link copied to clipboard!"))
-      .catch(() => alert("Failed to copy link."));
-  }}
->
-  📤 Share
-</button>
-
+                        className="btn btn-outline-secondary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const shareUrl = `${window.location.origin}/coursedescp/${c.id}`;
+                          navigator.clipboard.writeText(shareUrl)
+                            .then(() => alert("Link copied to clipboard!"))
+                            .catch(() => alert("Failed to copy link."));
+                        }}
+                      >
+                        📤 Share
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -288,7 +337,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* Pagination Bar */}
         <div className="d-flex justify-content-center mt-4 mb-5 flex-wrap gap-2">
           {generatePageNumbers().map((page, index) =>
             page === "..." ? (

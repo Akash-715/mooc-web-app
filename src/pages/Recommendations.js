@@ -97,6 +97,33 @@ export default function Recommendations() {
     navigate("/feedback");
   };
 
+  const handleRetakeQuiz = () => {
+    navigate("/quiz");
+  };
+
+  const downloadCSV = () => {
+    const csvHeader = "Title,Description,Platform,Duration,URL\n";
+    const csvRows = recommendations.map((c) =>
+      [
+        `"${c.title}"`,
+        `"${c.description}"`,
+        c.platform,
+        c.duration,
+        c.url
+      ].join(",")
+    );
+    const csvContent = csvHeader + csvRows.join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "recommendations.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div
       style={{
@@ -116,7 +143,9 @@ export default function Recommendations() {
 
         <div className="row mt-4">
           {recommendations.length === 0 ? (
-            <p className="text-center">No recommendations available.</p>
+            <p className="text-center text-muted">
+              No available courses to recommend for now. Please come back later.
+            </p>
           ) : (
             recommendations.map((course) => (
               <div key={course.id} className="col-md-4">
@@ -191,7 +220,7 @@ export default function Recommendations() {
         </div>
 
         {recommendations.length > 0 && (
-          <div className="text-center mt-4">
+          <div className="text-center mt-4 d-flex flex-column gap-3">
             <Button
               style={{
                 backgroundColor: "#6f4e37",
@@ -201,6 +230,14 @@ export default function Recommendations() {
               onClick={handleGiveFeedback}
             >
               Give Feedback
+            </Button>
+
+            <Button variant="outline-secondary" onClick={handleRetakeQuiz}>
+              🔁 Retake Quiz
+            </Button>
+
+            <Button variant="outline-dark" onClick={downloadCSV}>
+              ⬇ Download as CSV
             </Button>
           </div>
         )}

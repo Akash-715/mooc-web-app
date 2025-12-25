@@ -59,10 +59,10 @@ export default function Register() {
 
       await axios.post(`/profile`, payload);
 
-      alert("✅ Registration submitted successfully!");
+      alert("Registration submitted successfully!");
       navigate("/user-dashboard");
     } catch (err) {
-      console.error("❌ Registration error:", err);
+      console.error("Registration error:", err);
       alert(
         "Registration failed: " +
           (err.response?.data?.message || "Please try again")
@@ -106,12 +106,15 @@ export default function Register() {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Phone Number</Form.Label>
+              <Form.Label>
+                Phone Number <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 type="tel"
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
+                required
                 style={{ borderColor: "#6f4e37" }}
               />
             </Form.Group>
@@ -136,11 +139,14 @@ export default function Register() {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Preferred Platform</Form.Label>
+              <Form.Label>
+                Preferred Platform <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Select
                 name="preferredPlatform"
                 value={formData.preferredPlatform}
                 onChange={handleChange}
+                required
                 style={{ borderColor: "#6f4e37" }}
               >
                 <option value="">-- Choose Platform --</option>
@@ -154,35 +160,44 @@ export default function Register() {
 
           <Col md={6}>
             <Form.Group className="mb-3">
-              <Form.Label>Primary Interests</Form.Label>
+              <Form.Label>
+                Primary Interests <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="primaryInterests"
                 value={formData.primaryInterests}
                 onChange={handleChange}
                 placeholder="e.g. AI, Web Development"
+                required
                 style={{ borderColor: "#6f4e37" }}
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Learning Goals (Optional)</Form.Label>
+              <Form.Label>
+                Learning Goals <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={2}
                 name="learningGoals"
                 value={formData.learningGoals}
                 onChange={handleChange}
+                required
                 style={{ borderColor: "#6f4e37" }}
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Preferred Difficulty Level</Form.Label>
+              <Form.Label>
+                Preferred Difficulty Level <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Select
                 name="preferredDifficultyLevel"
                 value={formData.preferredDifficultyLevel}
                 onChange={handleChange}
+                required
                 style={{ borderColor: "#6f4e37" }}
               >
                 <option value="">-- Choose --</option>

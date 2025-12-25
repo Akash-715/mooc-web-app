@@ -9,7 +9,7 @@ export default function UserDashboard() {
   const [error, setError] = useState("");
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const fileInputRef = useRef(null);
-  const [feedbackMsg, setFeedbackMsg] = useState("");
+  const [feedbackMsg] = useState("");
   const [editing, setEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState({});
 
@@ -220,8 +220,8 @@ export default function UserDashboard() {
               {savedCourses.length === 0 ? (
                 <p>No saved courses found.</p>
               ) : (
-                savedCourses.map(c => (
-                  <Card key={c.courseId} className="mb-3">
+                savedCourses.map((c,idx) => (
+                  <Card key={c.courseId||idx} className="mb-3">
                     <Card.Body>
                       <h5>{c.title}</h5>
                       <p>{c.description}</p>
@@ -242,8 +242,8 @@ export default function UserDashboard() {
               {recommendedCourses.length === 0 ? (
                 <p>No recommendations available.</p>
               ) : (
-                recommendedCourses.map(course => (
-                  <Card key={course.id} className="mb-3">
+                recommendedCourses.map((course,idx) => (
+                  <Card key={course.id||idx} className="mb-3">
                     <Card.Body>
                       <h5>{course.title}</h5>
                       <p>{course.description}</p>

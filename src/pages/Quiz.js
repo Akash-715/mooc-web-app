@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Card, ProgressBar } from "react-bootstrap";
 import bgImage from "../assets/coffee-quiz-bg.png";
@@ -14,6 +14,13 @@ export default function Quiz() {
     difficulty: "",
     goal: "",
   });
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      alert("Please log in to access the quiz.");
+      navigate("/login");
+    }
+  }, []);
 
   const groupedTags = {
     "Front-End Development": ["HTML5", "CSS3", "JavaScript", "Web Design", "Angular"],
@@ -54,21 +61,27 @@ export default function Quiz() {
   };
 
   const handleNext = () => {
-  if (level < 3) {
-    setLevel(level + 1);
-  } else {
-    const payload = {
-      tags: answers.interest.flatMap((group) => groupedTags[group] || []),
-      platforms: answers.preferredPlatforms,
-      difficulty: answers.difficulty,
-      duration: answers.courseLength,
-      goal: answers.goal,
-    };
+    if (level < 3) {
+      setLevel(level + 1);
+    } else {
+      const payload = {
+        tags: answers.interest.flatMap((group) => groupedTags[group] || []),
+        platforms: answers.preferredPlatforms,
+        difficulty: answers.difficulty,
+        duration: answers.courseLength,
+        goal: answers.goal,
+      };
 
-    localStorage.setItem("quizPayload", JSON.stringify(payload));
-    navigate("/recommendations");
-  }
-};
+      localStorage.setItem("quizPayload", JSON.stringify(payload));
+      navigate("/recommendations");
+    }
+  };
+
+  const handleBack = () => {
+    if (level > 1) {
+      setLevel(level - 1);
+    }
+  };
 
   const progress = level * 33;
 
@@ -224,7 +237,14 @@ export default function Quiz() {
               </>
             )}
 
-            <div className="text-center mt-3">
+            <div className="d-flex justify-content-between mt-3">
+              {level > 1 ? (
+                <Button variant="outline-secondary" onClick={handleBack}>
+                  ← Go Back
+                </Button>
+              ) : (
+                <div></div>
+              )}
               <Button
                 variant="dark"
                 onClick={handleNext}
@@ -232,7 +252,7 @@ export default function Quiz() {
                 style={{
                   backgroundColor: "#6f4e37",
                   border: "none",
-                  width: "100%",
+                  width: "60%",
                 }}
               >
                 {level < 3 ? "Next →" : "Get Recommendations"}

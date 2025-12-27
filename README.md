@@ -90,8 +90,3 @@ POST http://localhost:8080/api/auth/signin
 Use Postman or your frontend for interactions.
 
 ---
-
-## 🙋 Author
-
-John Bellarmine  
-GitHub: [@JohnBellar](https://github.com/JohnBellar)
